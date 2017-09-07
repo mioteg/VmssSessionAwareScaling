@@ -1,0 +1,8 @@
+C:\Demo\VmssSessionAwareScaling\AzureVmssSessionScaling.Core\bin\Debug\netcoreapp1.1\AzureVmssSessionScaling.Core.deps.json
+C:\Demo\VmssSessionAwareScaling\AzureVmssSessionScaling.Core\bin\Debug\netcoreapp1.1\AzureVmssSessionScaling.Core.dll
+C:\Demo\VmssSessionAwareScaling\AzureVmssSessionScaling.Core\obj\Debug\netcoreapp1.1\AzureVmssSessionScaling.Core.csprojResolveAssemblyReference.cache
+C:\Demo\VmssSessionAwareScaling\AzureVmssSessionScaling.Core\obj\Debug\netcoreapp1.1\AzureVmssSessionScaling.Core.csproj.CoreCompileInputs.cache
+C:\Demo\VmssSessionAwareScaling\AzureVmssSessionScaling.Core\obj\Debug\netcoreapp1.1\AzureVmssSessionScaling.Core.AssemblyInfo.cs
+C:\Demo\VmssSessionAwareScaling\AzureVmssSessionScaling.Core\bin\Debug\netcoreapp1.1\AzureVmssSessionScaling.Core.pdb
+C:\Demo\VmssSessionAwareScaling\AzureVmssSessionScaling.Core\obj\Debug\netcoreapp1.1\AzureVmssSessionScaling.Core.dll
+C:\Demo\VmssSessionAwareScaling\AzureVmssSessionScaling.Core\obj\Debug\netcoreapp1.1\AzureVmssSessionScaling.Core.pdb
