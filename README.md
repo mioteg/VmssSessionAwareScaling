@@ -47,7 +47,11 @@ To use the sample application, you need to take the following actions:
 4. Put the following values in the Config.cs:
 
     a. DirectoryId - The tenant ID of the Azure Active Directory your subscription (and app) are tied to.
+    
     b. ApplicationId - The Applicication ID of the App in Azure AD
+    
     c. ApplicationKey - A key that you created as a password for the App. If you don't have one, go to Azure Ad -> App Registrations -> Your App -> Keys to create one.
+    
     d. ResourceGroupName - The name of the resource group of the VMSS.
+    
     e. VmssName - The name of the VMSS in the Resource Group.
