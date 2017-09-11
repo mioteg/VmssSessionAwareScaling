@@ -36,3 +36,18 @@ The sample application is a console that understands two commands:
 2. remove - this removes a particular session. The parameter for ths command is the number of the session. The session list is shown after each command.
 
 You can run the code using the VmssManager, which works with an existing VMSS. You can use the TestVmssManager instead to provide a local testbed.
+
+### Setting up your environment
+
+To use the sample application, you need to take the following actions:
+
+1. [Create a Virtual Machine Scale Set](https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-portal-create)
+2. [Create an App Registration in Azure](https://docs.microsoft.com/en-us/azure/active-directory/active-directory-app-registration)
+3. [Give the App permissions on the Resource Group](https://docs.microsoft.com/en-us/azure/active-directory/role-based-access-control-configure) in which you created the Virtual Machine Scale Set, so it has permissions to make changes to the VMSS.
+4. Put the following values in the Config.cs:
+
+    a. DirectoryId - The tenant ID of the Azure Active Directory your subscription (and app) are tied to.
+    b. ApplicationId - The Applicication ID of the App in Azure AD
+    c. ApplicationKey - A key that you created as a password for the App. If you don't have one, go to Azure Ad -> App Registrations -> Your App -> Keys to create one.
+    d. ResourceGroupName - The name of the resource group of the VMSS.
+    e. VmssName - The name of the VMSS in the Resource Group.
