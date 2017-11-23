@@ -15,5 +15,7 @@ namespace AzureVmssSessionScaling.Core
         public string Name { get; set; }
         public PowerState PowerState { get; set; }
         public string PrivateIpAddress { get; set; }
+        public int? FaultDomain { get; set; }
+        public int? UpdateDomain { get; set; }
     }
 }

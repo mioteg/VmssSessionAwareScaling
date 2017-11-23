@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.10
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureVmssSessionScaling.Core", "AzureVmssSessionScaling.Core\AzureVmssSessionScaling.Core.csproj", "{B369312A-5F2A-4D5B-A288-219AE158A79B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureVmssSessionScaling.TestConsole", "AzureVmssSessionScaling.TestConsole\AzureVmssSessionScaling.TestConsole.csproj", "{218080BB-09AA-4C62-B94D-95357731E599}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureVmssSessionScaling.TestConsole", "AzureVmssSessionScaling.TestConsole\AzureVmssSessionScaling.TestConsole.csproj", "{218080BB-09AA-4C62-B94D-95357731E599}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

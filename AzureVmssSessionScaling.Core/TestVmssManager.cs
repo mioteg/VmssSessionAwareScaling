@@ -13,6 +13,10 @@ namespace AzureVmssSessionScaling.Core
     {
         private List<VmssVmInfo> _vmList = new List<VmssVmInfo>();
         private int _lastInstanceId;
+        private int _lastFaultDomain;
+        private int _lastUpdateDomain;
+        private const int _numberOfFaultDomains = 3;
+        private const int _numberOfUpdateDomains = 5;
         
         public TestVmssManager()
         {
@@ -35,8 +39,12 @@ namespace AzureVmssSessionScaling.Core
                 var instance = new VmssVmInfo();
                 instance.InstanceId = _lastInstanceId.ToString();
                 instance.PowerState = PowerState.Running;
+                instance.FaultDomain = _lastFaultDomain;
+                instance.UpdateDomain = _lastUpdateDomain;
                 _vmList.Add(instance);
                 _lastInstanceId++;
+                _lastFaultDomain = (_lastFaultDomain + 1) % _numberOfFaultDomains;
+                _lastUpdateDomain = (_lastUpdateDomain + 1) % _numberOfUpdateDomains;
             }
         }
 

@@ -59,7 +59,8 @@ namespace AzureVmssSessionScaling.Core
                 vmInfo.Name = vm.Name;
                 vmInfo.PowerState = vm.PowerState;
                 vmInfo.PrivateIpAddress = vm.ListNetworkInterfaces().First().PrimaryPrivateIP;
-
+                vmInfo.FaultDomain = vm.InstanceView.PlatformFaultDomain;
+                vmInfo.UpdateDomain = vm.InstanceView.PlatformUpdateDomain;
                 vmList.Add(vmInfo);
             }
             return vmList;

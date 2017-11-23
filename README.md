@@ -11,6 +11,11 @@ This code lacks at least the following:
 2. Logging
 3. Persistence of the load and potentially other things that need to be persisted in case of restart of the scale management code.
 
+## Known issues
+
+This code has not been tested with [Large VM Scale Sets](https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-placement-groups).
+The code working with Fault Domains may not work when the Scale Set is put in multiple placement groups.
+
 ## Architecture
 
 The key components in this solution are the Capacity Manager (VmssCapacityManager) and the Load Manager (IVmssLoadManager). These two components interact to determine the load on the VMSS, and the available capacity.

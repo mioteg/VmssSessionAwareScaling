@@ -80,7 +80,76 @@ namespace AzureVmssSessionScaling.Core
         }
 
         /// <summary>
-        /// 
+        /// Closes instances based on the number of instances that need to be closed.
+        /// Takes into account the fault domains of the different VMs to ensure an equal distribution
+        /// across Fault Domains.
+        /// </summary>
+        /// <param name="numberOfInstancesToClose">Number of instances that need to be closed.</param>
+        /// <returns>Number of closed instances.</returns>
+        private int CloseInstances(int numberOfInstancesToClose)
+        {
+            int closedInstances = 0;
+            for (var i = 0; i < numberOfInstancesToClose; i++)
+            {
+                var activeInstances = _vmssInstances.Where(v => v.State == VmssInstanceState.Running).ToList();
+                var mostVmsInFaultDomain = activeInstances.GroupBy(v => v.VmInfo.FaultDomain).OrderByDescending(g => g.Count()).Select(g => g.Count()).First(); 
+                var faultDomainsWithMostVms = activeInstances.GroupBy(v => v.VmInfo.FaultDomain).Where(g => g.Count() == mostVmsInFaultDomain).Select(g => g.Key);
+                var instanceToClose = activeInstances.Where(v => faultDomainsWithMostVms.Contains(v.VmInfo.FaultDomain)).OrderBy(o => o.Load).FirstOrDefault();
+                if(instanceToClose != null)
+                {
+                    instanceToClose.State = VmssInstanceState.Closing;
+                    _vmssLoadManager.CloseInstance(instanceToClose);
+                    instanceToClose.State = VmssInstanceState.Closed;
+                    closedInstances++;
+                }
+            }
+            return closedInstances;
+        }
+
+        /// <summary>
+        /// Opens instances based on the number of instances that need to be opened.
+        /// Takes into account the fault domains of the different VMs to ensure an equal distribution
+        /// across Fault Domains.
+        /// </summary>
+        /// <param name="numberOfInstancesToOpen">Number of instances that need to be opened.</param>
+        /// <returns>Number of instances opened.</returns>
+        private int OpenInstances(int numberOfInstancesToOpen)
+        {
+            int openedInstances = 0;
+            var inactiveInstances = _vmssInstances.Where(v => v.State == VmssInstanceState.Closed).ToList();
+            if (numberOfInstancesToOpen >= inactiveInstances.Count)
+            {
+                foreach (var instance in inactiveInstances)
+                {
+                    instance.State = VmssInstanceState.Opening;
+                    _vmssLoadManager.OpenInstance(instance);
+                    instance.State = VmssInstanceState.Running;
+                    openedInstances++;
+                }
+            }
+            else
+            {
+                for (var i = 0; i < numberOfInstancesToOpen; i++)
+                {
+                    var mostInactiveVmsInFaultDomain = inactiveInstances.GroupBy(v => v.VmInfo.FaultDomain).OrderByDescending(g => g.Count()).Select(g => g.Count()).First();
+                    var faultDomainsWithMostInactiveVms = inactiveInstances.GroupBy(v => v.VmInfo.FaultDomain).Where(g => g.Count() == mostInactiveVmsInFaultDomain).Select(g => g.Key);
+                    var instanceToOpen = inactiveInstances.Where(v => faultDomainsWithMostInactiveVms.Contains(v.VmInfo.FaultDomain)).OrderBy(o => o.Load).FirstOrDefault();
+                    if (instanceToOpen != null)
+                    {
+                        instanceToOpen.State = VmssInstanceState.Opening;
+                        _vmssLoadManager.OpenInstance(instanceToOpen);
+                        instanceToOpen.State = VmssInstanceState.Running;
+                        openedInstances++;
+                        inactiveInstances.Remove(instanceToOpen);
+                    }
+                }
+            }
+            return openedInstances;
+        }
+
+        /// <summary>
+        /// Determines whether the VMSS needs to scale up or down. If there is overcapacity instances
+        /// are marked to be closed (no longer accept load). Closed instances with no load are removed.
         /// </summary>
         private async void Scale()
         { 
@@ -96,25 +165,12 @@ namespace AzureVmssSessionScaling.Core
             if (activeInstanceCount > neededInstanceCount)
             {
                 // Close instances with the lowest load, so they don't accept new sessions.
-                var instancesToDeallocate = _vmssInstances.OrderBy(i => i.Load).Take(activeInstanceCount - neededInstanceCount);
-                foreach (var instance in instancesToDeallocate)
-                {
-                    instance.State = VmssInstanceState.Closing;
-                    _vmssLoadManager.CloseInstance(instance);
-                    instance.State = VmssInstanceState.Closed;
-                }
+                activeInstanceCount += CloseInstances(activeInstanceCount - neededInstanceCount);
             }
             else if (activeInstanceCount < neededInstanceCount)
             {
                 // Open up any existing capacity that was not accepting new load to accept new load.
-                var instancesToOpen = _vmssInstances.Where(i => i.State == VmssInstanceState.Closed).OrderBy(i => i.Load).Take(neededInstanceCount - activeInstanceCount);
-                foreach (var instance in instancesToOpen)
-                {
-                    instance.State = VmssInstanceState.Opening;
-                    _vmssLoadManager.OpenInstance(instance);
-                    instance.State = VmssInstanceState.Running;
-                    activeInstanceCount++;
-                }
+                activeInstanceCount += OpenInstances(neededInstanceCount - activeInstanceCount);
             }
 
             // Active and needed counts updated. Now check if the VMSS needs to be modified.
@@ -122,7 +178,7 @@ namespace AzureVmssSessionScaling.Core
             {
                 _vmssManager.AddInstancesAsync(neededInstanceCount - activeInstanceCount, UpdateCompleted);
             }
-            else if (activeInstanceCount > neededInstanceCount)
+            else
             {
                 var instancesToDelete = _vmssInstances.Where(i => i.State == VmssInstanceState.Closed && i.Load == 0).ToArray();
                 _vmssManager.DeleteInstancesAsync(instancesToDelete.Select(i => i.InstanceId), UpdateCompleted);
@@ -131,10 +187,6 @@ namespace AzureVmssSessionScaling.Core
                     _vmssLoadManager.DeleteInstance(instance);
                     _vmssInstances.Remove(instance);
                 }
-            }
-            else
-            {
-                UpdateCompleted();
             }
         }
 
